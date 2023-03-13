@@ -42,7 +42,7 @@ def objective_function(params, grad, args):
         learningRate = int(BGSamples)
     
     # Read N frames from a video 
-    frames = load_video(video_path, 125, (800, 800))
+    frames = load_video(video_path, 250, (800, 800))
 
     # Set BGS parameters
     bgsalgorithm = pysky360.Vibe()
@@ -68,7 +68,7 @@ def objective_function(params, grad, args):
 
     # Moving objects    
     rng = random.seed(12345)
-    circles = [movingobjects.MovingCircle(centerX, centerY, radiusOfMask) for i in range(12)]
+    circles = [movingobjects.MovingCircle(centerX, centerY, radiusOfMask) for i in range(16)]
 
     for frame in frames: 
 
@@ -92,8 +92,8 @@ def objective_function(params, grad, args):
         total_FN += FN
     
     temp = metrics.Metrics(total_TP, total_TN, total_FP, total_FN)
-    print("Fitness (f-score): " + str(np.round(temp.f1_score,4)))
-    return temp.f1_score
+    print("Fitness (MCC): " + str(np.round(temp.MCC,4)))
+    return temp.MCC
 
 def my_constraint(x, grad):
     # Constraint 1: Param 3 <= Param 2
@@ -114,11 +114,12 @@ def is_power_of_two(n: int) -> bool:
     return (n & (n - 1)) == 0
 
 
+video_file = "testBG.mp4"
 
 # Run Global NLOPT optimiser
-print("Running global optimiser...")
+print("\nRunning global optimiser...")
 opt = nlopt.opt(nlopt.GN_CRS2_LM, 4)
-opt.set_max_objective(lambda x, grad: objective_function(x, grad, "../videos/sunandclouds3.mp4"))
+opt.set_max_objective(lambda x, grad: objective_function(x, grad, video_file))
 lower_bounds = [5, 2, 1, 2]
 upper_bounds = [80, 32, 2, 16]
 opt.set_lower_bounds(lower_bounds)
@@ -128,12 +129,12 @@ initial_params = [random.randint(5, 80), random.randint(2, 32), random.randint(1
 result = opt.optimize(initial_params)
 maxf = opt.last_optimum_value()
 print("Best parameters from global search:", np.round(result))
-print("Best F-score:", maxf)
+print("Best score:", maxf)
 
 # Run local NLOPT optimiser onb best
 print("\nRunning local optimiser...")
 opt = nlopt.opt(nlopt.LN_COBYLA, 4)
-opt.set_max_objective(lambda x, grad: objective_function(x, grad, "../videos/sunandclouds3.mp4"))
+opt.set_max_objective(lambda x, grad: objective_function(x, grad, video_file))
 opt.set_lower_bounds(lower_bounds)
 opt.set_upper_bounds(upper_bounds)
 opt.set_maxeval(6)
@@ -141,4 +142,4 @@ opt.add_inequality_constraint(my_constraint)
 result = opt.optimize(result)
 maxf = opt.last_optimum_value()
 print("Best parameters after local optimiser: ", np.round(result))
-print("Best f-score: ", maxf)
+print("Best score: ", maxf)
