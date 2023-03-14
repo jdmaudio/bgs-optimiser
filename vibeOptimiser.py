@@ -88,7 +88,7 @@ def objective_function(params, grad, args):
         total_FN += FN
     
     temp = metrics.Metrics(total_TP, total_TN, total_FP, total_FN)
-    fitness = ((temp.precision * 2) + (temp.MCC)) / 3
+    fitness = ((temp.precision * 3) + (temp.MCC)) / 4
     print("Fitness: " + str(np.round(fitness,4)))
     # print("Fitness (MCC): " + str(np.round(temp.MCC,4)))
     # return temp.MCC
@@ -114,7 +114,7 @@ def is_power_of_two(n: int) -> bool:
 
 
 # Read N frames from a video 
-video_file = "testBG.mp4"
+video_file = "../videos/sunandclouds2.mp4"
 frames = load_video(video_file, 250, (800, 800))
 
 # Run Global NLOPT optimiser
