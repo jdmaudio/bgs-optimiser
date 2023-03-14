@@ -31,15 +31,6 @@ def draw_synthetic_data(groundTruth, frame, circles):
     groundTruth = cv2.cvtColor(groundTruth, cv2.COLOR_BGR2GRAY)
     return frame, groundTruth
 
-def my_objective_wrapper(x):
-    # Check if the constraints are satisfied
-    if np.sum(np.round(x[1:4],1)) - 1.0 > 0.0:
-        # Constraints are violated, return a large value
-        return 0
-    else:
-        # Constraints are satisfied, call the objective function
-        return objective_function(x)
-
 
 def objective_function(params, grad, args):
 
@@ -109,7 +100,7 @@ def my_constraint(x, grad):
 
 
 # Read N frames from a video 
-video_file = "../videos/sunandclouds.mp4"
+video_file = "../videos/0c1c69e9-2e99-41e2-99c0-46dcc33454d1.mp4"
 frames = load_video(video_file, 250, (800, 800))
 
 # Run Global NLOPT optimiser
