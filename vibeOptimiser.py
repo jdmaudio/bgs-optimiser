@@ -35,15 +35,12 @@ def draw_synthetic_data(groundTruth, frame, circles):
 
 def objective_function(params, grad, args):
 
-    video_path = args
+    frames = args
     threshold, BGSamples, requiredBGSample, learningRate = params[0], params[1], params[2], params[3]
 
     if int(learningRate) > int(BGSamples):
         learningRate = int(BGSamples)
     
-    # Read N frames from a video 
-    frames = load_video(video_path, 250, (800, 800))
-
     # Set BGS parameters
     bgsalgorithm = pysky360.Vibe()
     parameters = bgsalgorithm.getParameters()
@@ -116,10 +113,13 @@ def is_power_of_two(n: int) -> bool:
 
 video_file = "testBG.mp4"
 
+# Read N frames from a video 
+frames = load_video(video_file, 250, (800, 800))
+
 # Run Global NLOPT optimiser
 print("\nRunning global optimiser...")
 opt = nlopt.opt(nlopt.GN_CRS2_LM, 4)
-opt.set_max_objective(lambda x, grad: objective_function(x, grad, video_file))
+opt.set_max_objective(lambda x, grad: objective_function(x, grad, frames))
 lower_bounds = [5, 2, 1, 2]
 upper_bounds = [80, 32, 2, 16]
 opt.set_lower_bounds(lower_bounds)
@@ -134,7 +134,7 @@ print("Best score:", maxf)
 # Run local NLOPT optimiser onb best
 print("\nRunning local optimiser...")
 opt = nlopt.opt(nlopt.LN_COBYLA, 4)
-opt.set_max_objective(lambda x, grad: objective_function(x, grad, video_file))
+opt.set_max_objective(lambda x, grad: objective_function(x, grad, frames))
 opt.set_lower_bounds(lower_bounds)
 opt.set_upper_bounds(upper_bounds)
 opt.set_maxeval(6)
