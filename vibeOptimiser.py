@@ -10,7 +10,6 @@ def load_video(video_path, num_frames=100, frameSize=(1024,1024)):
     
     cap = cv2.VideoCapture(video_path)
 
-    # Reads the first N frames
     frames = []
     for i in range(num_frames):
         ret, frame = cap.read()
@@ -89,8 +88,11 @@ def objective_function(params, grad, args):
         total_FN += FN
     
     temp = metrics.Metrics(total_TP, total_TN, total_FP, total_FN)
-    print("Fitness (MCC): " + str(np.round(temp.MCC,4)))
-    return temp.MCC
+    fitness = ((temp.precision * 2) + (temp.MCC)) / 3
+    print("Fitness: " + str(np.round(fitness,4)))
+    # print("Fitness (MCC): " + str(np.round(temp.MCC,4)))
+    # return temp.MCC
+    return fitness
 
 def my_constraint(x, grad):
     # Constraint 1: Param 3 <= Param 2
@@ -111,9 +113,8 @@ def is_power_of_two(n: int) -> bool:
     return (n & (n - 1)) == 0
 
 
-video_file = "testBG.mp4"
-
 # Read N frames from a video 
+video_file = "testBG.mp4"
 frames = load_video(video_file, 250, (800, 800))
 
 # Run Global NLOPT optimiser
